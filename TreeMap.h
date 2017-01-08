@@ -5,115 +5,200 @@
 #include <initializer_list>
 #include <stdexcept>
 #include <utility>
+#include <iterator>
+#include <iostream>
 
 namespace aisdi
 {
+
+    template <typename KeyType, typename ValueType>
+    class Node
+    {
+    public:
+        std::pair<const KeyType,ValueType> data;
+        Node *Parent, *Right, *Left;
+        Node():Parent(nullptr), Right(nullptr), Left(nullptr){}
+        Node(KeyType key, ValueType value):data(key, value), Parent(nullptr), Right(nullptr), Left(nullptr)
+        {}
+
+    };
+template <typename KeyType, typename ValueType>
+ Node<const KeyType,  ValueType>* minNode(Node< const KeyType,  ValueType> *SubTree)
+  {
+    Node<const KeyType,  ValueType>* Temp = SubTree;
+    while(Temp!=nullptr &&Temp->Left!=nullptr)Temp=Temp->Left;
+    return Temp;
+  }
+  template <typename KeyType, typename ValueType>
+  Node<const KeyType,  ValueType>* maxNode(Node<const KeyType,  ValueType> *SubTree)
+  {
+    Node<const KeyType,  ValueType>* Temp = SubTree;
+    while(Temp&&Temp->Right!=nullptr)Temp=Temp->Right;
+    return Temp;
+  }
+
 
 template <typename KeyType, typename ValueType>
 class TreeMap
 {
 public:
+
   using key_type = KeyType;
   using mapped_type = ValueType;
   using value_type = std::pair<const key_type, mapped_type>;
   using size_type = std::size_t;
   using reference = value_type&;
   using const_reference = const value_type&;
+  using node= Node<const KeyType,  ValueType>;
 
   class ConstIterator;
   class Iterator;
   using iterator = Iterator;
   using const_iterator = ConstIterator;
 
-  TreeMap()
-  {}
 
+  node *Root;
+  size_type size;
+
+  TreeMap():Root(nullptr),size(0)
+  {
+  }
   TreeMap(std::initializer_list<value_type> list)
   {
     (void)list; // disables "unused argument" warning, can be removed when method is implemented.
-    throw std::runtime_error("TODO");
+    throw std::runtime_error("TOD36ODO");
   }
 
   TreeMap(const TreeMap& other)
   {
     (void)other;
-    throw std::runtime_error("TODO");
+    throw std::runtime_error("TO685DO");
   }
 
   TreeMap(TreeMap&& other)
   {
     (void)other;
-    throw std::runtime_error("TODO");
+    throw std::runtime_error("TO1243DO");
   }
 
   TreeMap& operator=(const TreeMap& other)
   {
     (void)other;
-    throw std::runtime_error("TODO");
+    throw std::runtime_error("TO235234DO");
   }
 
   TreeMap& operator=(TreeMap&& other)
   {
     (void)other;
-    throw std::runtime_error("TODO");
+    throw std::runtime_error("TO4356DO");
   }
 
   bool isEmpty() const
   {
-    throw std::runtime_error("TODO");
+    return(Root==nullptr);
+
   }
 
   mapped_type& operator[](const key_type& key)
   {
-    (void)key;
-    throw std::runtime_error("TODO");
+
+    node *Pointer = Root, *Previous=nullptr;
+    bool IsFound=false;
+    while(IsFound==false&&Pointer!=nullptr)
+    {
+        Previous=Pointer;
+        if(key==Pointer->data.first) IsFound=true;
+        else if(key<Pointer->data.first&&Pointer->Left!=nullptr)Pointer=Pointer->Left;
+        else if(key>Pointer->data.first&&Pointer->Right!=nullptr)Pointer=Pointer->Right;
+    }
+
+    if(!IsFound)
+    {
+        ++size;
+        Pointer = new node(key,ValueType{});
+        Pointer->Parent= Previous;
+        if(isEmpty())
+        {
+            Root=Pointer;
+        }
+        else
+        {
+            if(key<Previous->data.first) Previous->Left=Pointer;
+            else if(key>Previous->data.first) Previous->Right=Pointer;
+        }
+    }
+    return Pointer->data.second;
   }
 
   const mapped_type& valueOf(const key_type& key) const
   {
     (void)key;
-    throw std::runtime_error("TODO");
+    throw std::runtime_error("TO7694DO");
   }
 
   mapped_type& valueOf(const key_type& key)
   {
     (void)key;
-    throw std::runtime_error("TODO");
+    throw std::runtime_error("TO6793DO");
   }
 
   const_iterator find(const key_type& key) const
   {
-    (void)key;
-    throw std::runtime_error("TODO");
+    node *Pointer=Root;
+    bool isFound= false;
+    if(isEmpty())return end();
+    while (Pointer && (Pointer->data.first != key))
+    {
+        if (key < Pointer->data.first) Pointer = Pointer->Left;
+        else Pointer = Pointer->Right;
+    }
+    if(!isFound) return end();
+    return ConstIterator(Pointer,Root);
   }
 
   iterator find(const key_type& key)
   {
-    (void)key;
-    throw std::runtime_error("TODO");
+    int l=0;
+    node *Pointerro=Root;
+    if(isEmpty())return end();
+    while (Pointerro!=nullptr && Pointerro->data.first != key)
+    {
+        std::cout<<Pointerro->data.second<<l++<<std::endl;
+        if (key < Pointerro->data.first)
+        {
+            std::cout<<"<<<<<<<"<<std::endl;
+            Pointerro = Pointerro->Left;
+        }
+        else
+        {
+            std::cout<<">>>>>>>"<<std::endl;
+            Pointerro = Pointerro->Right;
+        }
+    }
+    return Iterator(Pointerro,Root);
   }
 
   void remove(const key_type& key)
   {
     (void)key;
-    throw std::runtime_error("TODO");
+    throw std::runtime_error("TO73574DO");
   }
 
   void remove(const const_iterator& it)
   {
     (void)it;
-    throw std::runtime_error("TODO");
+    throw std::runtime_error("TO23526DO");
   }
 
   size_type getSize() const
   {
-    throw std::runtime_error("TODO");
+    return size;
   }
 
   bool operator==(const TreeMap& other) const
   {
     (void)other;
-    throw std::runtime_error("TODO");
+    throw std::runtime_error("TO87DO");
   }
 
   bool operator!=(const TreeMap& other) const
@@ -123,22 +208,24 @@ public:
 
   iterator begin()
   {
-    throw std::runtime_error("TODO");
+    return Iterator(minNode(Root),Root);
   }
 
   iterator end()
   {
-    throw std::runtime_error("TODO");
+    if(isEmpty())return begin();
+    return Iterator(nullptr,Root);
   }
 
   const_iterator cbegin() const
   {
-    throw std::runtime_error("TODO");
+    return ConstIterator(minNode(Root),Root);
   }
 
   const_iterator cend() const
   {
-    throw std::runtime_error("TODO");
+    if(isEmpty()) return cbegin();
+    return ConstIterator(nullptr,Root);
   }
 
   const_iterator begin() const
@@ -152,6 +239,7 @@ public:
   }
 };
 
+
 template <typename KeyType, typename ValueType>
 class TreeMap<KeyType, ValueType>::ConstIterator
 {
@@ -160,39 +248,75 @@ public:
   using iterator_category = std::bidirectional_iterator_tag;
   using value_type = typename TreeMap::value_type;
   using pointer = const typename TreeMap::value_type*;
-
+  node *Pointer, *Root;
   explicit ConstIterator()
   {}
-
-  ConstIterator(const ConstIterator& other)
+  ConstIterator(node *Pointerro, node *Rooterro):Pointer(Pointerro),Root(Rooterro)
+  {}
+  ConstIterator(const ConstIterator& other):Pointer(other.Pointer),Root(other.Root)
   {
-    (void)other;
-    throw std::runtime_error("TODO");
   }
 
   ConstIterator& operator++()
   {
-    throw std::runtime_error("TODO");
+    if(Pointer==nullptr) throw std::out_of_range("Cannot increment end");
+    if(Pointer->Right!=nullptr)
+    {
+        Pointer=Pointer->Right;
+        while(Pointer->Left!=nullptr) Pointer=Pointer->Left;
+        return(*this);
+    }
+    node* TmParent=Pointer->Parent;
+    while(TmParent && TmParent->Left!=Pointer)
+    {
+        Pointer=TmParent;
+        TmParent=TmParent->Parent;
+    }
+    Pointer= TmParent;
+    return(*this);
   }
 
   ConstIterator operator++(int)
   {
-    throw std::runtime_error("TODO");
+    auto Prev= *this;
+    ++(*this);
+    return Prev;
   }
 
   ConstIterator& operator--()
   {
-    throw std::runtime_error("TODO");
+    if(Pointer == minNode(Root)) throw std::out_of_range("Cannot decrement begin");
+    if(Pointer==nullptr)
+    {
+        Pointer= maxNode(Root);
+        return *this;
+    }
+
+    if(Pointer->Left!=nullptr) Pointer=maxNode(Pointer->Left);
+    else
+    {
+        node *Tmp= Pointer->Parent;
+        while (Tmp && Tmp->Right != Pointer)
+        {
+            Pointer = Tmp;
+            Tmp = Tmp->Parent;
+        }
+        Pointer=Tmp;
+    }
+    return *this;
   }
 
   ConstIterator operator--(int)
   {
-    throw std::runtime_error("TODO");
+    auto Prev = *this;
+    --(*this);
+    return Prev;
   }
 
   reference operator*() const
   {
-    throw std::runtime_error("TODO");
+    if(Pointer==nullptr) throw std::out_of_range("Cannot dereference end");
+    return Pointer->data;
   }
 
   pointer operator->() const
@@ -202,8 +326,7 @@ public:
 
   bool operator==(const ConstIterator& other) const
   {
-    (void)other;
-    throw std::runtime_error("TODO");
+    return(Pointer==other.Pointer);
   }
 
   bool operator!=(const ConstIterator& other) const
@@ -221,6 +344,8 @@ public:
 
   explicit Iterator()
   {}
+
+  Iterator(node *Pointerro, node *Rooterro):ConstIterator(Pointerro,Rooterro){}
 
   Iterator(const ConstIterator& other)
     : ConstIterator(other)
