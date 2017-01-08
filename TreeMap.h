@@ -63,10 +63,12 @@ public:
   TreeMap():Root(nullptr),size(0)
   {
   }
-  TreeMap(std::initializer_list<value_type> list)
+  TreeMap(std::initializer_list<value_type> list): TreeMap()
   {
-    (void)list; // disables "unused argument" warning, can be removed when method is implemented.
-    throw std::runtime_error("TOD36ODO");
+    for(auto ite= list.begin(); ite!=list.end();++ite)
+    {
+        this->operator[]((*ite).first)=(*ite).second;
+    }
   }
 
   TreeMap(const TreeMap& other)
@@ -101,15 +103,14 @@ public:
 
   mapped_type& operator[](const key_type& key)
   {
-
     node *Pointer = Root, *Previous=nullptr;
     bool IsFound=false;
     while(IsFound==false&&Pointer!=nullptr)
     {
         Previous=Pointer;
         if(key==Pointer->data.first) IsFound=true;
-        else if(key<Pointer->data.first&&Pointer->Left!=nullptr)Pointer=Pointer->Left;
-        else if(key>Pointer->data.first&&Pointer->Right!=nullptr)Pointer=Pointer->Right;
+        else if(key<Pointer->data.first)Pointer=Pointer->Left;
+        else if(key>Pointer->data.first)Pointer=Pointer->Right;
     }
 
     if(!IsFound)
@@ -144,34 +145,34 @@ public:
 
   const_iterator find(const key_type& key) const
   {
-    node *Pointer=Root;
-    bool isFound= false;
-    if(isEmpty())return end();
-    while (Pointer && (Pointer->data.first != key))
-    {
-        if (key < Pointer->data.first) Pointer = Pointer->Left;
-        else Pointer = Pointer->Right;
-    }
-    if(!isFound) return end();
-    return ConstIterator(Pointer,Root);
-  }
-
-  iterator find(const key_type& key)
-  {
-    int l=0;
     node *Pointerro=Root;
     if(isEmpty())return end();
     while (Pointerro!=nullptr && Pointerro->data.first != key)
     {
-        std::cout<<Pointerro->data.second<<l++<<std::endl;
         if (key < Pointerro->data.first)
         {
-            std::cout<<"<<<<<<<"<<std::endl;
             Pointerro = Pointerro->Left;
         }
         else
         {
-            std::cout<<">>>>>>>"<<std::endl;
+            Pointerro = Pointerro->Right;
+        }
+    }
+    return ConstIterator(Pointerro,Root);
+  }
+
+  iterator find(const key_type& key)
+  {
+    node *Pointerro=Root;
+    if(isEmpty())return end();
+    while (Pointerro!=nullptr && Pointerro->data.first != key)
+    {
+        if (key < Pointerro->data.first)
+        {
+            Pointerro = Pointerro->Left;
+        }
+        else
+        {
             Pointerro = Pointerro->Right;
         }
     }
