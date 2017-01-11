@@ -1,22 +1,28 @@
 #ifndef AISDI_MAPS_HASHMAP_H
 #define AISDI_MAPS_HASHMAP_H
 
+#include "HashList.h"
 #include <cstddef>
 #include <initializer_list>
 #include <stdexcept>
 #include <utility>
+#include <iterator>
+#include <list>
+#include <functional>
+#include <iostream>
+#include <algorithm>
 
 namespace aisdi
 {
-
 template <typename KeyType, typename ValueType>
 class HashMap
 {
-public:
+private:
+  using size_type = std::size_t;
   using key_type = KeyType;
   using mapped_type = ValueType;
   using value_type = std::pair<const key_type, mapped_type>;
-  using size_type = std::size_t;
+
   using reference = value_type&;
   using const_reference = const value_type&;
 
@@ -24,8 +30,20 @@ public:
   class Iterator;
   using iterator = Iterator;
   using const_iterator = ConstIterator;
+  using Hashlist = HashList<const KeyType,  ValueType>;
+  const static size_type arraySize = 16000;
+  size_type size, firstIndex, lastIndex;
+  Hashlist Array[arraySize];
 
-  HashMap()
+
+public:
+
+
+
+
+
+
+  HashMap():size(0)
   {}
 
   HashMap(std::initializer_list<value_type> list)
@@ -60,13 +78,23 @@ public:
 
   bool isEmpty() const
   {
-    throw std::runtime_error("TODO");
+    return size==0;
   }
 
   mapped_type& operator[](const key_type& key)
   {
-    (void)key;
-    throw std::runtime_error("TODO");
+    std::hash<size_type> hash;
+    size_type hashIndex = hash(key) % arraySize;
+    auto it=find(key);
+    if(it!=end()) return it->second;
+    else
+    {
+        Array[hashIndex].append(key, mapped_type{});
+        if( hashIndex < firstIndex) firstIndex = hashIndex;
+        if( lastIndex < hashIndex ) lastIndex = hashIndex;
+        ++size;
+        return (--Array[hashIndex].end())->second;
+    }
   }
 
   const mapped_type& valueOf(const key_type& key) const
@@ -83,14 +111,28 @@ public:
 
   const_iterator find(const key_type& key) const
   {
-    (void)key;
-    throw std::runtime_error("TODO");
+    if( isEmpty())return end();
+    std::hash<size_type> hash;
+    size_type hashedIndex = hash(key) % arraySize;
+    for ( auto it = Array[hashedIndex].begin(); it != Array[hashedIndex].end(); ++it)
+    {
+        if( it->first == key )
+        return const_iterator(it, hashedIndex, *this);
+    }
+    return this->end();
   }
 
   iterator find(const key_type& key)
   {
-    (void)key;
-    throw std::runtime_error("TODO");
+    if( isEmpty())return end();
+    std::hash<size_type> hash;
+    size_type hashedIndex = hash(key) % arraySize;
+    for ( auto it = Array[hashedIndex].begin(); it != Array[hashedIndex].end(); ++it)
+    {
+        if( it->first == key )
+        return iterator(it, hashedIndex, *this);
+    }
+    return this->end();
   }
 
   void remove(const key_type& key)

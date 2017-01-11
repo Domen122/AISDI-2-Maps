@@ -41,6 +41,7 @@ template <typename KeyType, typename ValueType>
 template <typename KeyType, typename ValueType>
 class TreeMap
 {
+
 public:
 
   using key_type = KeyType;
@@ -71,28 +72,50 @@ public:
     }
   }
 
-  TreeMap(const TreeMap& other)
+  node *Copy(node *CpNode)
   {
-    (void)other;
-    throw std::runtime_error("TO685DO");
+    if(CpNode==nullptr)return nullptr;
+    node *CreatedNode = new node(CpNode->data.first, CpNode->data.second);
+    if(CpNode->Left!=nullptr)
+    {
+        CreatedNode->Left= Copy(CpNode->Left);
+        CreatedNode->Left->Parent=CreatedNode;
+    }
+    if(CpNode->Right!=nullptr)
+    {
+        CreatedNode->Right= Copy(CpNode->Right);
+        CreatedNode->Right->Parent=CreatedNode;
+    }
+    return CreatedNode;
   }
 
-  TreeMap(TreeMap&& other)
+  TreeMap(const TreeMap& other)
   {
-    (void)other;
-    throw std::runtime_error("TO1243DO");
+        size=other.size;
+        Root= Copy(other.Root);
+  }
+
+  TreeMap(TreeMap&& other): TreeMap()
+  {
+    //if((*this)==other)return;
+    std::swap(Root,other.Root);
+    std::swap(size,other.size);
   }
 
   TreeMap& operator=(const TreeMap& other)
   {
-    (void)other;
-    throw std::runtime_error("TO235234DO");
+    Root=other.Root;
+    size=other.size;
+    return *this;
   }
 
   TreeMap& operator=(TreeMap&& other)
   {
-    (void)other;
-    throw std::runtime_error("TO4356DO");
+    std::swap(Root,other.Root);
+    std::swap(size,other.size);
+    other.Root=nullptr;
+    other.size=0;
+    return *this;
   }
 
   bool isEmpty() const
@@ -133,14 +156,16 @@ public:
 
   const mapped_type& valueOf(const key_type& key) const
   {
-    (void)key;
-    throw std::runtime_error("TO7694DO");
+    ConstIterator Iter=find(key);
+    if(Iter==end())throw std::out_of_range("There is no Node of given key");
+    return Iter.Pointer->data.second;
   }
 
   mapped_type& valueOf(const key_type& key)
   {
-    (void)key;
-    throw std::runtime_error("TO6793DO");
+    Iterator Iter=find(key);
+    if(Iter==end())throw std::out_of_range("There is no Node of given key");
+    return Iter.Pointer->data.second;
   }
 
   const_iterator find(const key_type& key) const
@@ -181,14 +206,57 @@ public:
 
   void remove(const key_type& key)
   {
-    (void)key;
-    throw std::runtime_error("TO73574DO");
+    if(isEmpty())throw std::out_of_range("The tree is empty!");
+    Iterator Iter=find(key);
+    if(Iter==end())throw std::out_of_range("No Node of given key");
+    node *x=nullptr, *y=nullptr, *DeleteNode=Iter.Pointer;
+    if (DeleteNode->Left==NULL || DeleteNode->Right==NULL)
+		y=DeleteNode;
+	else
+		y=minNode(DeleteNode->Right);
+	if (y->Left != NULL)
+		x=y->Left;
+	else
+		x=y->Right;
+	if (x!=NULL)  x->Parent = y->Parent;
+	if (y->Parent == NULL)  Root = x;
+	else
+    {
+        if (y == y->Parent->Left)  y->Parent->Left = x;
+		else y->Parent->Right = x;
+    }
+	if (y != DeleteNode)
+    {
+        if(DeleteNode==DeleteNode->Parent->Left) DeleteNode->Parent->Left=y;
+        else DeleteNode->Parent->Right=y;
+        y->Left=DeleteNode->Left;
+        y->Right=DeleteNode->Right;
+        y->Parent=DeleteNode->Parent;
+    }
+    DeleteNode=nullptr;
+
+    /*node *LocPoint= Iter.Pointer;
+    if(LocPoint->Left==nullptr && LocPoint->Right==nullptr)
+    {
+        LocPoint=nullptr;
+        return;
+    }
+    if(LocPoint->Left!=nullptr&&LocPoint->Right!=nullptr)
+    {
+        node *newPoint = minNode(LocPoint->Right);
+        node *parentofDel = LocPoint->Parent;
+        if(LocPoint=parentofDel->Left)
+        {
+
+        }
+    }*/
+    --size;
   }
 
   void remove(const const_iterator& it)
   {
-    (void)it;
-    throw std::runtime_error("TO23526DO");
+    const KeyType &key = it->first;
+    remove(key);
   }
 
   size_type getSize() const
@@ -198,8 +266,12 @@ public:
 
   bool operator==(const TreeMap& other) const
   {
-    (void)other;
-    throw std::runtime_error("TO87DO");
+    if(getSize()!=other.getSize())return false;
+    for(auto iter=begin(),otheriter=other.begin();iter!=end();++iter,++otheriter)
+    {
+        if(*iter!=*otheriter)return false;
+    }
+    return true;
   }
 
   bool operator!=(const TreeMap& other) const
