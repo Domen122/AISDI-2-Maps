@@ -219,16 +219,16 @@ public:
     Iterator Iter=find(key);
     if(Iter==end())throw std::out_of_range("No Node of given key");
     node *x=nullptr, *y=nullptr, *DeleteNode=Iter.Pointer;
-    if (DeleteNode->Left==NULL || DeleteNode->Right==NULL)
+    if (DeleteNode->Left==nullptr || DeleteNode->Right==nullptr)
 		y=DeleteNode;
 	else
 		y=minNode(DeleteNode->Right);
-	if (y->Left != NULL)
+	if (y->Left != nullptr)
 		x=y->Left;
 	else
 		x=y->Right;
-	if (x!=NULL)  x->Parent = y->Parent;
-	if (y->Parent == NULL)  Root = x;
+	if (x!=nullptr)  x->Parent = y->Parent;
+	if (y->Parent == nullptr)  Root = x;
 	else
     {
         if (y == y->Parent->Left)  y->Parent->Left = x;
@@ -236,16 +236,49 @@ public:
     }
 	if (y != DeleteNode)
     {
+        if (DeleteNode==Root)
+        {
+            if(DeleteNode->Left!=nullptr)
+            {
+                DeleteNode->Left->Parent=y;
+                y->Left=DeleteNode->Left;
+            }
+            if(DeleteNode->Right!=nullptr)
+            {
+                DeleteNode->Right->Parent=y;
+                y->Right=DeleteNode->Right;
+            }
+            Root=y;
+        }
+        else
+        {
         if(DeleteNode==DeleteNode->Parent->Left) DeleteNode->Parent->Left=y;
         else DeleteNode->Parent->Right=y;
-        y->Left=DeleteNode->Left;
-        y->Right=DeleteNode->Right;
+        if(DeleteNode->Left!=nullptr)
+        {
+            y->Left=DeleteNode->Left;
+            y->Left->Parent=y;
+        }
+        if(DeleteNode->Right!=nullptr)
+        {
+            y->Right=DeleteNode->Right;
+            y->Right->Parent=y;
+        }
         y->Parent=DeleteNode->Parent;
+        }
     }
     DeleteNode=nullptr;
     --size;
   }
-
+    void Nodecount()
+    {
+        int i=1;
+        auto iter = Iterator(maxNode(Root),Root);
+        auto it=begin();
+        for(;it!=iter;++it,++i)
+        {
+        }
+    }
   void remove(const const_iterator& it)
   {
     const KeyType &key = it->first;

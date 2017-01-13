@@ -53,13 +53,11 @@ void testTrees(int  repeatCount, int *Arr)
   diff=std::chrono::duration_cast<std::chrono::milliseconds>(endtime-starttime).count()/1000.0;
   std::cout << "Czas wstawienia " << repeatCount << " elementow do Drzewa: " << diff << " sekund" << std::endl;
   starttime=std::chrono::steady_clock::now();
-  std::cout<<T1.Root->data.first<<T1.Root->data.second<<std::endl;
-  /*for( int i=0;i<repeatCount; ++i)
+  for( int i=0;i<repeatCount; ++i)
   {
     unsigned int A=Arr[i];
-     std::cout<<A<<std::endl;
     T1.remove(A);
-    }*/
+    }
   endtime=std::chrono::steady_clock::now();
   diff=std::chrono::duration_cast<std::chrono::milliseconds>(endtime-starttime).count()/1000.0;
   std::cout << "Czas usuniecia wszystkich elementow z Drzewa: " << diff << " sekund" << std::endl;
@@ -82,19 +80,19 @@ void perfomTest()
 int main(int argc, char* argv[])
 {
     srand(time( NULL ));
-int Arr[1000];
-for(int i=0;i<1000;++i)
+int Arr[1000000];
+for(int i=0;i<1000000;++i)
 {
     Arr[i]=i;
 }
-for(int i=0;i<1000;++i)
+for(int i=0;i<1000000;++i)
 {
-    int random = rand()%1000;
+    int random = rand()%1000000;
     int temp=Arr[i];
     Arr[i]=Arr[random];
     Arr[random]=temp;
 }
-  const std::size_t repeatCount = argc > 1 ? std::atoll(argv[1]) : 1000;
+  const std::size_t repeatCount = argc > 1 ? std::atoll(argv[1]) : 1000000;
     testHash(repeatCount, Arr);
     testTrees(repeatCount,Arr);
   return 0;
