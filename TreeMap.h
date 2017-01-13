@@ -97,15 +97,20 @@ public:
 
   TreeMap(TreeMap&& other): TreeMap()
   {
-    //if((*this)==other)return;
+    if((*this)==other)return;
     std::swap(Root,other.Root);
     std::swap(size,other.size);
   }
 
   TreeMap& operator=(const TreeMap& other)
   {
-    Root=other.Root;
-    size=other.size;
+    if(&other!=this)
+    {
+        CutTree(Root);
+        Root=nullptr;
+        TreeCopy(other.Root);
+        size=other.size;
+    }
     return *this;
   }
 
@@ -117,20 +122,28 @@ public:
     other.size=0;
     return *this;
   }
-  /*void CutTree(node *Cut)
+  void TreeCopy(node *cp)
   {
+    if(cp==nullptr)return;
+    (*this)[cp->data.first]=cp->data.second;
+    if(cp->Left!=nullptr)TreeCopy(cp->Left);
+    if(cp->Right!=nullptr)TreeCopy(cp->Right);
+  }
+  void CutTree(node *Cut)
+  {
+    if(Cut==nullptr)return;
     if( Cut->Left != nullptr )  CutTree(Cut->Left);
     if( Cut->Right != nullptr ) CutTree(Cut->Right);
     delete Cut;
-     }
+    size=0;
+    }
  ~TreeMap()
 {
     if(!isEmpty()) CutTree(Root);
-}*/
+}
   bool isEmpty() const
   {
     return(Root==nullptr);
-
   }
 
   mapped_type& operator[](const key_type& key)
@@ -219,21 +232,22 @@ public:
     Iterator Iter=find(key);
     if(Iter==end())throw std::out_of_range("No Node of given key");
     node *x=nullptr, *y=nullptr, *DeleteNode=Iter.Pointer;
-    if (DeleteNode->Left==nullptr || DeleteNode->Right==nullptr)
-		y=DeleteNode;
-	else
-		y=minNode(DeleteNode->Right);
-	if (y->Left != nullptr)
-		x=y->Left;
-	else
-		x=y->Right;
+
+    if (DeleteNode->Left==nullptr || DeleteNode->Right==nullptr)  y=DeleteNode;
+	else  y=minNode(DeleteNode->Right);
+
+	if (y->Left != nullptr) x=y->Left;
+	else x=y->Right;
+
 	if (x!=nullptr)  x->Parent = y->Parent;
+
 	if (y->Parent == nullptr)  Root = x;
 	else
     {
         if (y == y->Parent->Left)  y->Parent->Left = x;
 		else y->Parent->Right = x;
     }
+
 	if (y != DeleteNode)
     {
         if (DeleteNode==Root)
@@ -252,19 +266,19 @@ public:
         }
         else
         {
-        if(DeleteNode==DeleteNode->Parent->Left) DeleteNode->Parent->Left=y;
-        else DeleteNode->Parent->Right=y;
-        if(DeleteNode->Left!=nullptr)
-        {
-            y->Left=DeleteNode->Left;
-            y->Left->Parent=y;
-        }
-        if(DeleteNode->Right!=nullptr)
-        {
-            y->Right=DeleteNode->Right;
-            y->Right->Parent=y;
-        }
-        y->Parent=DeleteNode->Parent;
+            if(DeleteNode==DeleteNode->Parent->Left) DeleteNode->Parent->Left=y;
+            else DeleteNode->Parent->Right=y;
+            if(DeleteNode->Left!=nullptr)
+            {
+                y->Left=DeleteNode->Left;
+                y->Left->Parent=y;
+            }
+            if(DeleteNode->Right!=nullptr)
+            {
+                y->Right=DeleteNode->Right;
+                y->Right->Parent=y;
+            }
+            y->Parent=DeleteNode->Parent;
         }
     }
     DeleteNode=nullptr;
@@ -293,6 +307,7 @@ public:
   bool operator==(const TreeMap& other) const
   {
     if(getSize()!=other.getSize())return false;
+    if(isEmpty())return true;
     for(auto iter=begin(),otheriter=other.begin();iter!=end();++iter,++otheriter)
     {
         if(*iter!=*otheriter)return false;

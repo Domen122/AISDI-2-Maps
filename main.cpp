@@ -63,36 +63,22 @@ void testTrees(int  repeatCount, int *Arr)
   std::cout << "Czas usuniecia wszystkich elementow z Drzewa: " << diff << " sekund" << std::endl;
 }
 
-/*namespace
-{
-
-template <typename K, typename V>
-using Map = aisdi::Map<K, V>;
-
-void perfomTest()
-{
-  Map<int, std::string> map;
-  map[1] = "TODO";
-}
-
-} // namespace
-*/
 int main(int argc, char* argv[])
 {
     srand(time( NULL ));
-int Arr[1000000];
-for(int i=0;i<1000000;++i)
+int Arr[20000];
+for(int i=0;i<20000;++i)
 {
     Arr[i]=i;
 }
-for(int i=0;i<1000000;++i)
+for(int i=0;i<20000;++i)
 {
-    int random = rand()%1000000;
+    int random = rand()%20000;
     int temp=Arr[i];
     Arr[i]=Arr[random];
     Arr[random]=temp;
 }
-  const std::size_t repeatCount = argc > 1 ? std::atoll(argv[1]) : 1000000;
+  const std::size_t repeatCount = argc > 1 ? std::atoll(argv[1]) : 20000;
     testHash(repeatCount, Arr);
     testTrees(repeatCount,Arr);
   return 0;
