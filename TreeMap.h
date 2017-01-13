@@ -117,7 +117,16 @@ public:
     other.size=0;
     return *this;
   }
-
+  /*void CutTree(node *Cut)
+  {
+    if( Cut->Left != nullptr )  CutTree(Cut->Left);
+    if( Cut->Right != nullptr ) CutTree(Cut->Right);
+    delete Cut;
+     }
+ ~TreeMap()
+{
+    if(!isEmpty()) CutTree(Root);
+}*/
   bool isEmpty() const
   {
     return(Root==nullptr);
@@ -234,22 +243,6 @@ public:
         y->Parent=DeleteNode->Parent;
     }
     DeleteNode=nullptr;
-
-    /*node *LocPoint= Iter.Pointer;
-    if(LocPoint->Left==nullptr && LocPoint->Right==nullptr)
-    {
-        LocPoint=nullptr;
-        return;
-    }
-    if(LocPoint->Left!=nullptr&&LocPoint->Right!=nullptr)
-    {
-        node *newPoint = minNode(LocPoint->Right);
-        node *parentofDel = LocPoint->Parent;
-        if(LocPoint=parentofDel->Left)
-        {
-
-        }
-    }*/
     --size;
   }
 

@@ -2,6 +2,7 @@
 #ifndef LIST_H
 #define LIST_H
 
+#include <iostream>
 #include <stdexcept>
 #include <utility>
 
@@ -31,13 +32,14 @@ namespace aisdi {
     class HashList
     {
     private:
+    public:
     void swap(HashList &other)
     {
         std::swap(size,other.size);
         std::swap(Head, other.Head);
         std::swap(Tail,other.Tail);
     }
-    public:
+
 
         using key_type = KeyType;
         using mapped_type = ValueType;
@@ -50,7 +52,7 @@ namespace aisdi {
         class Iterator;
         using const_iterator = ConstIterator;
         using iterator = Iterator;
-        using Hashnode = HashNode<const KeyType,  ValueType>;
+        using Hashnode = HashNode<const key_type,  mapped_type>;
 
         size_type size;
         Hashnode *Head, *Tail;
@@ -66,7 +68,7 @@ namespace aisdi {
                 Hashnode *copied = other.Head;
                 while( copied != nullptr )
                 {
-                    append(copied->data->first, copied->data->second);
+                    append(copied->data.first, copied->data.second);
                     copied = copied->next;
                 }
             }
@@ -86,7 +88,7 @@ namespace aisdi {
             }
         }
 
-        void append(const key_type key, mapped_type value)
+        void append(const key_type &key, mapped_type value)
         {
             Hashnode *Pointer = new Hashnode(key,value);
             if(isEmpty())
@@ -105,7 +107,7 @@ namespace aisdi {
             ++size;
         }
 
-        bool isEmpty()
+        bool isEmpty() const
         {
             return size==0;
         }
@@ -150,8 +152,8 @@ namespace aisdi {
             if(Pointer==nullptr)throw std::out_of_range("There is no Node of given key");
             if(Pointer==Tail) Tail=Tail->prev;
             if(Pointer==Head) Head=Head->next;
-            Pointer->next->prev=Pointer->prev;
-            Pointer->prev->next=Pointer->next;
+            if(Pointer->next!=nullptr)Pointer->next->prev=Pointer->prev;
+            if(Pointer->prev!=nullptr)Pointer->prev->next=Pointer->next;
             delete Pointer;
             --size;
         }
@@ -178,13 +180,13 @@ namespace aisdi {
         const HashList& list;
 
     public:
-        ConstIterator( Hashnode *otherPtr, const HashList& otherList ):
-        Pointer(otherPtr),
+        ConstIterator( Hashnode *otherPointer, const HashList& otherList ):
+        Pointer(otherPointer),
         list(otherList)
         {}
 
         ConstIterator(const ConstIterator& other):
-        Pointer(other.ptr),
+        Pointer(other.Pointer),
         list(other.list)
         {}
 
@@ -210,7 +212,7 @@ namespace aisdi {
             if( Pointer == list.Head ) throw std::out_of_range("Cannot decrement end");
             if(Pointer==nullptr)//Pointer points to an end
             {
-                Pointer=Tail;
+                Pointer=list.Tail;
             }
             else    Pointer = Pointer->prev;
             return *this;
